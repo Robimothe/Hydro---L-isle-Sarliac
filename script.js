@@ -177,7 +177,7 @@ function drawChart(amontData, avalData) {
       intersect: false
     }
   }
-  );
+  });
 }
 
 
