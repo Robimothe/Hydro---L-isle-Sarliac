@@ -162,3 +162,8 @@ function drawChart(amontData, avalData) {
     }
   });
 }
+// ============================
+// Lancement
+// ============================
+
+loadData();
