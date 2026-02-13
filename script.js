@@ -45,7 +45,7 @@ async function fetchStationData(stationCode) {
   const url =
     `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr` +
     `?code_station=${stationCode}` +
-    `&grandeur_hydro=Q` +
+    `&grandeur_hydro=H` +
     `&size=30` +
     `&sort=desc`;
 
