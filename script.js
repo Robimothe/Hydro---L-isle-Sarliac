@@ -17,13 +17,13 @@ L.marker(sarliac).addTo(map)
 
 const stations = [
   {
-    code: "P6161510",  // station amont
+    code: "P616151001",  // station amont
     name: "Station Amont - Mayac",
     lat: 45.282566,
     lon: 0.936423
   },
   {
-    code: "P6161511",  // station aval
+    code: "P616151101",  // station aval
     name: "Station Aval - Escoire",
     lat: 45.212417,
     lon: 0.838358
