@@ -127,14 +127,14 @@ function drawChart(amontData, avalData) {
       labels: labels,
       datasets: [
         {
-          label: "Débit Amont (m³/s)",
+          label: "Hauteur d'eau Amont (m)",
           data: amontData.map(d => d.resultat_obs).reverse(),
           borderColor: "blue",
           fill: false,
           tension: 0.2
         },
         {
-          label: "Débit Aval (m³/s)",
+          label: "Hauteur d'eau Aval (m)",
           data: avalData.map(d => d.resultat_obs).reverse(),
           borderColor: "red",
           fill: false,
