@@ -13,8 +13,8 @@ const stations = [
   }
 ];
 
-// Carte
-const map = L.map('map').setView([45.12, 0.72], 12);
+// Initialisation carte
+const map = L.map('map').setView([45.25, 0.88], 11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
 .addTo(map);
@@ -23,45 +23,74 @@ async function loadStations() {
 
   for (let s of stations) {
 
-    const response = await fetch(
-      `https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=${s.code}&size=20`
-    );
+    try {
 
-    const data = await response.json();
+      // ✅ Proxy CORS
+      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(
+        `https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_station=${s.code}&size=20`
+      )}`;
 
-    if (!data.data || data.data.length === 0) continue;
+      const response = await fetch(url);
 
-    const latest = data.data[0];
-    const flow = latest.resultat;
+      if (!response.ok) {
+        console.log("Erreur HTTP :", response.status);
+        continue;
+      }
 
-    let color = "green";
+      const data = await response.json();
 
-    if (flow > 200) color = "orange";
-    if (flow > 500) color = "red";
+      if (!data.data || data.data.length === 0) {
+        console.log("Pas de données pour", s.name);
+        continue;
+      }
 
-    L.circleMarker([s.lat, s.lon], {
-      radius: 8,
-      color: color
-    })
-    .addTo(map)
-    .bindPopup(`${s.name}<br>Débit : ${flow} m³/s`);
+      const latest = data.data[0];
+      const flow = latest.resultat;
 
-    drawChart(data.data);
+      let color = "green";
+      if (flow > 200) color = "orange";
+      if (flow > 500) color = "red";
+
+      L.circleMarker([s.lat, s.lon], {
+        radius: 8,
+        color: color
+      })
+      .addTo(map)
+      .bindPopup(`${s.name}<br>Débit : ${flow} m³/s`);
+
+      // Graphique uniquement station amont
+      if (s.name === "Station Amont") {
+        drawChart(data.data);
+      }
+
+    } catch (error) {
+      console.error("Erreur API :", error);
+    }
   }
 }
 
 function drawChart(dataset) {
 
-  const ctx = document.getElementById('chart');
+  const ctx = document.getElementById('chart').getContext('2d');
 
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: dataset.map(d => d.date_obs),
+      labels: dataset.map(d => d.date_obs).reverse(),
       datasets: [{
         label: "Débit (m³/s)",
-        data: dataset.map(d => d.resultat)
+        data: dataset.map(d => d.resultat).reverse(),
+        fill: false,
+        tension: 0.2
       }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          display: false
+        }
+      }
     }
   });
 }
