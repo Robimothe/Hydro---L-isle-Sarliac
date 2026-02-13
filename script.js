@@ -125,26 +125,27 @@ function addStationMarker(station, flow) {
 // ============================
 
 function drawChart(amontData, avalData) {
-
   const ctx = document.getElementById('chart').getContext('2d');
 
-  const labels = amontData.map(d => d.date_obs).reverse();
+  if (chartInstance !== null) {
+    chartInstance.destroy();
+  }
 
-  new Chart(ctx, {
+  chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels: amontData.map(d => new Date(d.date_obs)),
       datasets: [
         {
-          label: "Hauteur d'eau Amont (m)",
-          data: amontData.map(d => d.resultat_obs).reverse(),
+          label: "Hauteur Amont (m)",
+          data: amontData.map(d => d.resultat_obs),
           borderColor: "blue",
           fill: false,
           tension: 0.2
         },
         {
-          label: "Hauteur d'eau Aval (m)",
-          data: avalData.map(d => d.resultat_obs).reverse(),
+          label: "Hauteur Aval (m)",
+          data: avalData.map(d => d.resultat_obs),
           borderColor: "red",
           fill: false,
           tension: 0.2
@@ -152,31 +153,25 @@ function drawChart(amontData, avalData) {
       ]
     },
     options: {
-    responsive: true,
-    scales: {
-      x: {
-        type: 'time',           // type temporel
-        time: {
-          unit: 'day',          // unité = jour
-          tooltipFormat: 'DD/MM/YYYY HH:mm'  // format du tooltip
-        },
-        title: {
-          display: true,
-          text: 'Date'
-        }
+      responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false
       },
-      y: {
-        title: {
-          display: true,
-          text: 'Hauteur (m)' // ou Débit m³/s
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'day',
+            tooltipFormat: 'DD/MM/YYYY HH:mm'
+          },
+          title: { display: true, text: 'Date' }
+        },
+        y: {
+          title: { display: true, text: 'Hauteur (m)' }
         }
       }
-    },
-    interaction: {
-      mode: 'index',
-      intersect: false
     }
-  }
   });
 }
 
