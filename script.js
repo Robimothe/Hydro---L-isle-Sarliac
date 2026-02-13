@@ -70,35 +70,6 @@ const url =
 }
 
 
-// ============================
-// 4️⃣ Chargement complet
-// ============================
-
-async function loadData() {
-
-  try {
-
-    const amontData = await fetchStationData(stations[0].code);
-    const avalData  = await fetchStationData(stations[1].code);
-
-    if (amontData.length === 0 || avalData.length === 0) {
-      console.warn("Données manquantes");
-      return;
-    }
-
-    // Derniers débits pour couleur carte
-    const amontFlow = amontData[0].resultat_obs;
-    const avalFlow  = avalData[0].resultat_obs;
-
-    addStationMarker(stations[0], amontFlow);
-    addStationMarker(stations[1], avalFlow);
-
-    drawChart(amontData, avalData);
-
-  } catch (err) {
-    console.error("Erreur :", err);
-  }
-}
 
 
 // ============================
