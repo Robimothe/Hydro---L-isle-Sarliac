@@ -13,9 +13,10 @@ const stations = [
   }
 ];
 
-// Initialisation carte
+// Centrage carte sur Sarliac
 const map = L.map('map').setView([45.25, 0.88], 11);
 
+// OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
 .addTo(map);
 
@@ -25,27 +26,19 @@ async function loadStations() {
 
     try {
 
-      // ✅ Proxy CORS
-      const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-        `https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_station=${s.code}&size=20`
-      )}`;
+      // 👉 API v2 Hubeau Hydrométrie (supporte CORS)
+      const url = `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr?code_station=${s.code}&grandeur_hydro=Q&size=20&sort=desc`;
 
       const response = await fetch(url);
+      const result = await response.json();
 
-      if (!response.ok) {
-        console.log("Erreur HTTP :", response.status);
+      if (!result.data || result.data.length === 0) {
+        console.warn("Pas de données pour", s.name);
         continue;
       }
 
-      const data = await response.json();
-
-      if (!data.data || data.data.length === 0) {
-        console.log("Pas de données pour", s.name);
-        continue;
-      }
-
-      const latest = data.data[0];
-      const flow = latest.resultat;
+      const latest = result.data[0];
+      const flow = latest.resultat_obs ?? latest.resultat || 0;
 
       let color = "green";
       if (flow > 200) color = "orange";
@@ -58,9 +51,9 @@ async function loadStations() {
       .addTo(map)
       .bindPopup(`${s.name}<br>Débit : ${flow} m³/s`);
 
-      // Graphique uniquement station amont
+      // Pour une seule série de graphique, on prend la première station
       if (s.name === "Station Amont") {
-        drawChart(data.data);
+        drawChart(result.data);
       }
 
     } catch (error) {
@@ -69,28 +62,24 @@ async function loadStations() {
   }
 }
 
-function drawChart(dataset) {
+function drawChart(data) {
 
   const ctx = document.getElementById('chart').getContext('2d');
 
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: dataset.map(d => d.date_obs).reverse(),
+      labels: data.map(d => d.date_obs).reverse(),
       datasets: [{
         label: "Débit (m³/s)",
-        data: dataset.map(d => d.resultat).reverse(),
+        data: data.map(d => d.resultat_obs ?? d.resultat).reverse(),
+        borderColor: 'blue',
         fill: false,
         tension: 0.2
       }]
     },
     options: {
-      responsive: true,
-      scales: {
-        x: {
-          display: false
-        }
-      }
+      responsive: true
     }
   });
 }
