@@ -51,7 +51,7 @@ async function fetchStationData(stationCode) {
 
 const url = 
   `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr` +
-  `?code_station=${s.code}` +
+  `?code_station=${stationCode}` +
   `&grandeur_hydro=H` +            // ou Q pour débit
   `&date_debut_obs=${dateDebut}` +
   `&date_fin_obs=${dateFin}` +
