@@ -36,7 +36,6 @@ const stations = [
   }
 ];
 
-
 // ============================
 // 3️⃣ Récupération données API
 // ============================
@@ -122,12 +121,7 @@ function drawChart(amontData, avalData) {
 
   const labels = amontData.map(d => d.date_obs).reverse();
 
-  // ✅ Détruire ancien graphique si existant
-  if (chartInstance !== null) {
-    chartInstance.destroy();
-  }
-
-  chartInstance = new Chart(ctx, {
+  new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
@@ -162,6 +156,8 @@ function drawChart(amontData, avalData) {
     }
   });
 }
+
+
 // ============================
 // Lancement
 // ============================
