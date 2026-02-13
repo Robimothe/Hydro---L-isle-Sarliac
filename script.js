@@ -35,19 +35,28 @@ const stations = [
     lon: 0.838358
   }
 ];
+// Calculer date début : lundi de la semaine
+const today = new Date();
+const day = today.getDay(); // 0 = dimanche
+const monday = new Date(today);
+monday.setDate(today.getDate() - ((day + 6) % 7)); // lundi de cette semaine
 
+const dateDebut = monday.toISOString().split('T')[0]; // YYYY-MM-DD
+const dateFin   = today.toISOString().split('T')[0];   // aujourd'hui
 // ============================
 // 3️⃣ Récupération données API
 // ============================
 
 async function fetchStationData(stationCode) {
 
-  const url =
-    `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr` +
-    `?code_station=${stationCode}` +
-    `&grandeur_hydro=H` +
-    `&size=30` +
-    `&sort=desc`;
+const url = 
+  `https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr` +
+  `?code_station=${s.code}` +
+  `&grandeur_hydro=H` +            // ou Q pour débit
+  `&date_debut_obs=${dateDebut}` +
+  `&date_fin_obs=${dateFin}` +
+  `&size=1000` +                   // assez grand pour tout récupérer
+  `&sort=asc`;
 
   const response = await fetch(url);
 
@@ -143,18 +152,32 @@ function drawChart(amontData, avalData) {
       ]
     },
     options: {
-      responsive: true,
-      interaction: {
-        mode: 'index',
-        intersect: false
+    responsive: true,
+    scales: {
+      x: {
+        type: 'time',           // type temporel
+        time: {
+          unit: 'day',          // unité = jour
+          tooltipFormat: 'DD/MM/YYYY HH:mm'  // format du tooltip
+        },
+        title: {
+          display: true,
+          text: 'Date'
+        }
       },
-      scales: {
-        x: {
-          display: false
+      y: {
+        title: {
+          display: true,
+          text: 'Hauteur (m)' // ou Débit m³/s
         }
       }
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false
     }
-  });
+  }
+  );
 }
 
 
