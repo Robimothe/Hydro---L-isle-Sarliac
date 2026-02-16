@@ -108,18 +108,24 @@ function drawChart(amontData, avalData) {
     chartInstance.destroy();
   }
 
-  function prepareData(data) {
-    return data
-      .map(d => ({
+function prepareData(data) {
+  return data
+    .map(d => {
+      const valueMm = parseFloat(d.resultat_obs);
+      const valueM = valueMm / 1000;   // conversion mm → m
+
+      return {
         x: new Date(d.date_obs),
-        y: parseFloat(d.resultat_obs)
-      }))
-      .filter(d =>
-        !isNaN(d.y) &&
-        d.y > 0 &&
-        d.y < 10   // hauteur réaliste en mètres
-      );
-  }
+        y: valueM
+      };
+    })
+    .filter(d =>
+      !isNaN(d.y) &&
+      d.y > 0 &&
+      d.y < 10
+    );
+}
+
 
   const amont = prepareData(amontData);
   const aval = prepareData(avalData);
@@ -182,8 +188,6 @@ function drawChart(amontData, avalData) {
           }
         },
         y: {
-          min: 0,
-          max: 5,  // limite réaliste pour éviter échelle absurde
           title: {
             display: true,
             text: 'Hauteur (m)'
@@ -206,7 +210,7 @@ async function loadData() {
     const avalData = await fetchStationData(stations[1].code);
     console.log("Amont:", amontData);
     console.log("Aval:", avalData);
-
+    console.log("Exemple valeur brute:", amontData[0].resultat_obs);
     drawChart(amontData, avalData);
 
   } catch (error) {
