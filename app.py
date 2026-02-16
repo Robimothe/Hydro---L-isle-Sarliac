@@ -33,12 +33,13 @@ def fetch_data(code_station):
 
     url = (
         "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr"
-        f"?code_station={code_station}"
-        f"&grandeur_hydro=H"
+        f"?code_entite={code_station}"
+        "&grandeur_hydro=H"
         f"&date_debut_obs={date_debut_str}"
         f"&date_fin_obs={date_fin_str}"
         "&size=20000"
         "&sort=asc"
+        "&timestep=60"
     )
 
     r = requests.get(url)
