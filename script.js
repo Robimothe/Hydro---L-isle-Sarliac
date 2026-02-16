@@ -108,30 +108,18 @@ function drawChart(amontData, avalData) {
     chartInstance.destroy();
   }
 
-function prepareData(data) {
-  return data
-    .map(d => {
-      const valueMm = parseFloat(d.resultat_obs);
-      const valueM = valueMm / 1000;   // conversion mm → m
-
+  function prepareData(data) {
+    return data.map(d => {
+      const valueM = parseFloat(d.resultat_obs) / 1000;
       return {
-        x: new Date(d.date_obs),
+        x: new Date(d.date_obs).getTime(),  // timestamp numérique
         y: valueM
       };
-    })
-    .filter(d =>
-      !isNaN(d.y) &&
-      d.y > 0 &&
-      d.y < 10
-    );
-}
-
+    });
+  }
 
   const amont = prepareData(amontData);
   const aval = prepareData(avalData);
-
-  console.log("Points amont affichés :", amont.length);
-  console.log("Points aval affichés :", aval.length);
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -175,11 +163,11 @@ function prepareData(data) {
       },
       scales: {
         x: {
-          type: 'time',
-          time: {
-            unit: 'hour',
-            displayFormats: {
-              hour: 'yyyy-MM-dd HH:mm'
+          type: 'linear',
+          ticks: {
+            callback: function(value) {
+              const date = new Date(value);
+              return date.toISOString().replace('T', ' ').substring(0,19);
             }
           },
           title: {
@@ -197,6 +185,7 @@ function prepareData(data) {
     }
   });
 }
+
 
 
 // ===================================================
