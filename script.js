@@ -49,11 +49,13 @@ stations.forEach((station, index) => {
 // ===================================================
 
 const today = new Date();
-const dateFin = today.toISOString();
+
+const dateFin = today.toISOString().split('T')[0];
 
 const dateDebutObj = new Date();
 dateDebutObj.setDate(today.getDate() - 7);
-const dateDebut = dateDebutObj.toISOString();
+
+const dateDebut = dateDebutObj.toISOString().split('T')[0];
 
 
 // ===================================================
@@ -68,19 +70,17 @@ async function fetchStationData(stationCode) {
     `&grandeur_hydro=H` +
     `&date_debut_obs=${dateDebut}` +
     `&date_fin_obs=${dateFin}` +
-    `&size=10000` +
+    `&size=20000` +
     `&sort=asc`;
 
   const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("Erreur API Hubeau");
-  }
-
   const json = await response.json();
+
+  console.log("Station", stationCode, "→", json.data.length, "valeurs");
 
   return json.data || [];
 }
+
 
 
 // ===================================================
@@ -108,8 +108,14 @@ function drawChart(amontData, avalData) {
     chartInstance.destroy();
   }
 
-  const amontClean = cleanData(amontData);
-  const avalClean = cleanData(avalData);
+  const formatData = (data) => {
+    return data
+      .filter(d => d.resultat_obs !== null)
+      .map(d => ({
+        x: new Date(d.date_obs),
+        y: parseFloat(d.resultat_obs)
+      }));
+  };
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -117,23 +123,23 @@ function drawChart(amontData, avalData) {
       datasets: [
         {
           label: "Hauteur Amont (m)",
-          data: amontClean,
+          data: formatData(amontData),
           borderColor: "blue",
-          tension: 0.2,
-          pointRadius: 0
+          pointRadius: 0,
+          tension: 0.2
         },
         {
           label: "Hauteur Aval (m)",
-          data: avalClean,
+          data: formatData(avalData),
           borderColor: "red",
-          tension: 0.2,
-          pointRadius: 0
+          pointRadius: 0,
+          tension: 0.2
         }
       ]
     },
     options: {
       responsive: true,
-      parsing: false,  // IMPORTANT
+      parsing: false,
       interaction: {
         mode: 'index',
         intersect: false
@@ -155,11 +161,17 @@ function drawChart(amontData, avalData) {
         x: {
           type: 'time',
           time: {
-            unit: 'day'
+            unit: 'hour',
+            displayFormats: {
+              hour: 'yyyy-MM-dd HH:mm:ss'
+            }
+          },
+          ticks: {
+            source: 'auto'
           },
           title: {
             display: true,
-            text: 'Date'
+            text: 'Date / Heure'
           }
         },
         y: {
