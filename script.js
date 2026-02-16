@@ -159,8 +159,40 @@ function drawChart(amontData, avalData) {
           zoom: {
             wheel: { enabled: true },
             pinch: { enabled: true },
-            mode: '
-
+            mode: 'x'
+          },
+          pan: {
+            enabled: true,
+            mode: 'x'
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'hour',
+            displayFormats: {
+              hour: 'yyyy-MM-dd HH:mm'
+            }
+          },
+          title: {
+            display: true,
+            text: 'Date / Heure'
+          }
+        },
+        y: {
+          min: 0,
+          max: 5,  // limite réaliste pour éviter échelle absurde
+          title: {
+            display: true,
+            text: 'Hauteur (m)'
+          }
+        }
+      }
+    }
+  });
+}
 
 
 // ===================================================
