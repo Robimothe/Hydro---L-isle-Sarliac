@@ -34,10 +34,10 @@ const stations = [
   }
 ];
 
-stations.forEach(station => {
+stations.forEach((station, index) => {
   L.circleMarker([station.lat, station.lon], {
     radius: 8,
-    color: "blue"
+    color: index === 0 ? "blue" : "red"
   })
   .addTo(map)
   .bindPopup(station.name);
@@ -88,7 +88,18 @@ async function fetchStationData(stationCode) {
 // ===================================================
 
 let chartInstance = null;
-
+function cleanData(data) {
+  return data
+    .map(d => ({
+      x: new Date(d.date_obs),
+      y: Number(d.resultat_obs)
+    }))
+    .filter(d => 
+      !isNaN(d.y) &&
+      d.y > 0 &&
+      d.y < 20   // sécurité : hauteur réaliste
+    );
+}
 function drawChart(amontData, avalData) {
 
   const ctx = document.getElementById('chart').getContext('2d');
@@ -97,26 +108,23 @@ function drawChart(amontData, avalData) {
     chartInstance.destroy();
   }
 
+  const amontClean = cleanData(amontData);
+  const avalClean = cleanData(avalData);
+
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       datasets: [
         {
           label: "Hauteur Amont (m)",
-          data: amontData.map(d => ({
-            x: new Date(d.date_obs),
-            y: d.resultat_obs
-          })),
+          data: amontClean,
           borderColor: "blue",
           tension: 0.2,
           pointRadius: 0
         },
         {
           label: "Hauteur Aval (m)",
-          data: avalData.map(d => ({
-            x: new Date(d.date_obs),
-            y: d.resultat_obs
-          })),
+          data: avalClean,
           borderColor: "red",
           tension: 0.2,
           pointRadius: 0
@@ -125,6 +133,7 @@ function drawChart(amontData, avalData) {
     },
     options: {
       responsive: true,
+      parsing: false,  // IMPORTANT
       interaction: {
         mode: 'index',
         intersect: false
