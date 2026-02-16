@@ -108,14 +108,24 @@ function drawChart(amontData, avalData) {
     chartInstance.destroy();
   }
 
-  const formatData = (data) => {
+  function prepareData(data) {
     return data
-      .filter(d => d.resultat_obs !== null)
       .map(d => ({
         x: new Date(d.date_obs),
         y: parseFloat(d.resultat_obs)
-      }));
-  };
+      }))
+      .filter(d =>
+        !isNaN(d.y) &&
+        d.y > 0 &&
+        d.y < 10   // hauteur réaliste en mètres
+      );
+  }
+
+  const amont = prepareData(amontData);
+  const aval = prepareData(avalData);
+
+  console.log("Points amont affichés :", amont.length);
+  console.log("Points aval affichés :", aval.length);
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -123,14 +133,14 @@ function drawChart(amontData, avalData) {
       datasets: [
         {
           label: "Hauteur Amont (m)",
-          data: formatData(amontData),
+          data: amont,
           borderColor: "blue",
           pointRadius: 0,
           tension: 0.2
         },
         {
           label: "Hauteur Aval (m)",
-          data: formatData(avalData),
+          data: aval,
           borderColor: "red",
           pointRadius: 0,
           tension: 0.2
@@ -149,41 +159,8 @@ function drawChart(amontData, avalData) {
           zoom: {
             wheel: { enabled: true },
             pinch: { enabled: true },
-            mode: 'x'
-          },
-          pan: {
-            enabled: true,
-            mode: 'x'
-          }
-        }
-      },
-      scales: {
-        x: {
-          type: 'time',
-          time: {
-            unit: 'hour',
-            displayFormats: {
-              hour: 'yyyy-MM-dd HH:mm:ss'
-            }
-          },
-          ticks: {
-            source: 'auto'
-          },
-          title: {
-            display: true,
-            text: 'Date / Heure'
-          }
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Hauteur (m)'
-          }
-        }
-      }
-    }
-  });
-}
+            mode: '
+
 
 
 // ===================================================
