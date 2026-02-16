@@ -70,7 +70,7 @@ async function fetchStationData(stationCode) {
     `&grandeur_hydro=H` +
     `&date_debut_obs=${dateDebut}` +
     `&date_fin_obs=${dateFin}` +
-    `&size=20000` +
+    `&size=5000` +
     `&sort=asc`;
 
   const response = await fetch(url);
