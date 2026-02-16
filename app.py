@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timedelta
 import plotly.express as px
 
-st.title("Suivi hydrologique - Isle (Sarliac)")
+st.title("Suivi hydrologique - Isle (amont et aval de Sarliac)")
 
 # ==========================
 # Paramètres stations
