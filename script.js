@@ -195,6 +195,8 @@ async function loadData() {
 
     const amontData = await fetchStationData(stations[0].code);
     const avalData = await fetchStationData(stations[1].code);
+    console.log("Amont:", amontData);
+    console.log("Aval:", avalData);
 
     drawChart(amontData, avalData);
 
